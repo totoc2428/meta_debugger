@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meta-python-visualizer
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    # Development mode: mount volumes for hot reload
+    # volumes:
+    #   - ./web:/usr/share/nginx/html:ro
+    #   - ./src:/usr/share/nginx/html/python/src:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Development service with hot reload
+  web-dev:
+    image: nginx:alpine
+    container_name: meta-python-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+      - ./src:/usr/share/nginx/html/python/src:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    profiles:
+      - dev

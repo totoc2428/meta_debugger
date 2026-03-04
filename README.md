@@ -1,6 +1,6 @@
-# Meta Python - Debugger Metaclass
+# Meta Python - Debugger Metaclass & AST Visualizer
 
-Une métaclasse Python pour le débogage automatique des accès aux attributs et des appels de méthodes.
+Une métaclasse Python pour le débogage automatique des accès aux attributs et des appels de méthodes, avec une interface web interactive pour visualiser l'AST (Abstract Syntax Tree).
 
 ## Description
 
@@ -8,6 +8,40 @@ Ce projet implémente une métaclasse `Meta` qui permet de surveiller automatiqu
 
 - **Les appels de méthodes** : avec tous les arguments (args et kwargs)
 - **Les accès aux attributs** : en lecture (get) et en écriture (set)
+
+De plus, une **interface web** permet de :
+
+- Éditer du code Python avec **CodeMirror 6** (syntax highlighting)
+- Visualiser l'**AST** en tree view interactif et en graphe **D3.js**
+- Exécuter le code directement dans le navigateur avec **Pyodide**
+- Inspecter les traces du Debugger (method_calls, attribute_accesses)
+
+## Interface Web
+
+![AST Visualizer](docs/screenshot.png)
+
+### Lancer avec Docker
+
+```bash
+# Build et lancement
+docker compose up --build
+
+# Accéder à l'interface
+# http://localhost:8080
+```
+
+### Mode développement (hot reload)
+
+```bash
+# Utiliser le profil dev avec montage de volumes
+docker compose --profile dev up web-dev
+```
+
+### Raccourcis clavier
+
+- `Ctrl+Enter` : Exécuter le code
+- Tree view : Cliquer sur un nœud pour voir le code correspondant dans l'éditeur
+- Graphe : Zoom avec la molette, pan avec drag
 
 ## Installation
 
@@ -47,12 +81,27 @@ print("Accès aux attributs:", Debugger.attribute_accesses)
 meta_python/
 ├── src/
 │   ├── __init__.py
+│   ├── ast_parser.py  # Parser AST vers JSON
 │   ├── debugger.py    # Classe Debugger pour la collecte des données
-│   └── meta.py        # Métaclasse Meta
+│   ├── meta.py        # Métaclasse Meta
+│   └── serializer.py  # Sérialisation JSON des données
+├── web/
+│   ├── index.html     # Page principale
+│   ├── css/
+│   │   └── styles.css # Styles (thème sombre)
+│   └── js/
+│       ├── main.js          # Orchestrateur
+│       ├── editor.js        # CodeMirror 6
+│       ├── pyodide-runner.js # Exécution Python
+│       ├── ast-tree.js      # Tree view
+│       └── ast-graph.js     # Graphe D3.js
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py    # Configuration pytest
 │   └── test_meta.py   # Tests unitaires
+├── Dockerfile         # Image Docker nginx
+├── docker-compose.yml # Configuration Docker
+├── nginx.conf         # Configuration nginx
 ├── main.py            # Exemple d'utilisation
 ├── pyproject.toml     # Configuration du projet
 └── README.md
@@ -91,6 +140,17 @@ pytest --cov=src --cov-report=html
     'value': 10                    # Valeur
 }
 ```
+
+## Technologies utilisées
+
+| Composant            | Technologie              |
+| -------------------- | ------------------------ |
+| Backend Python       | Métaclasse, module `ast` |
+| Éditeur de code      | CodeMirror 6             |
+| Exécution navigateur | Pyodide                  |
+| Visualisation AST    | D3.js v7                 |
+| Serveur web          | nginx:alpine             |
+| Conteneurisation     | Docker                   |
 
 ## Licence
 
