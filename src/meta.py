@@ -80,7 +80,7 @@ class Meta(type):
         return cls
     
     @staticmethod
-    def _wrap_method(cls: Type, method_name: str, func: Callable) -> Callable:
+    def _wrap_method(cls: Type, method_name: str, func: Callable) -> Callable: # type: ignore
         """Emballe une méthode pour enregistrer ses appels.
         
         Args:
